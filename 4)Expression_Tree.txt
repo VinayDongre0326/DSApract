@@ -1,0 +1,110 @@
+//Expression_Tree
+//2 3 1 * + 9 -
+//121 200 + 2 / 5 * 7 +
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+class TreeNode {
+public:
+    char value;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(char val) {
+        value = val;
+        left = nullptr;
+        right = nullptr;
+    }
+};
+
+bool isOperator(char ch) {
+    return ch == '+' || ch == '-' || ch == '*' || ch == '/';
+}
+
+TreeNode* constructTreeFromPostfix(string postfix) {
+    stack<TreeNode*> st;
+
+    for (char ch : postfix) {
+        if (isOperator(ch)) {
+            TreeNode* node = new TreeNode(ch);
+            node->right = st.top();
+            st.pop();
+            node->left = st.top();
+            st.pop();
+            st.push(node);
+        } else {
+            st.push(new TreeNode(ch));
+        }
+    }
+    return st.top();
+}
+
+void recursiveInOrder(TreeNode* root) {
+    if (root == nullptr) return;
+    recursiveInOrder(root->left);
+    cout << root->value << " ";
+    recursiveInOrder(root->right);
+}
+
+void nonRecursiveInOrder(TreeNode* root) {
+    stack<TreeNode*> st;
+    TreeNode* current = root;
+
+    while (current != nullptr || !st.empty()) {
+        while (current != nullptr) {
+            st.push(current);
+            current = current->left;
+        }
+
+        current = st.top();
+        st.pop();
+        cout << current->value << " ";
+        current = current->right;
+    }
+}
+
+void recursivePreOrder(TreeNode* root) {
+    if (root == nullptr) return;
+    cout << root->value << " ";
+    recursivePreOrder(root->left);
+    recursivePreOrder(root->right);
+}
+
+void nonRecursivePreOrder(TreeNode* root) {
+    if (root == nullptr) return;
+
+    stack<TreeNode*> st;
+    st.push(root);
+
+    while (!st.empty()) {
+        TreeNode* current = st.top();
+        st.pop();
+        cout << current->value << " ";
+
+        if (current->right) st.push(current->right);
+        if (current->left) st.push(current->left);
+    }
+}
+
+int main() {
+    string postfix;
+    cout << "Enter a postfix expression: ";
+    cin >> postfix;
+
+    TreeNode* root = constructTreeFromPostfix(postfix);
+
+    cout << "\nRecursive In-order Traversal: ";
+    recursiveInOrder(root);
+
+    cout << "\nNon-recursive In-order Traversal: ";
+    nonRecursiveInOrder(root);
+
+    cout << "\nRecursive Pre-order Traversal: ";
+    recursivePreOrder(root);
+
+    cout << "\nNon-recursive Pre-order Traversal: ";
+    nonRecursivePreOrder(root);
+    return 0;
+}

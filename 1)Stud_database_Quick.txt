@@ -1,0 +1,74 @@
+//Stud_database_Quick
+#include <stdio.h>
+#include <string.h>
+
+struct Student {
+    int rollNo;
+    char name[100];
+    float SGPA;
+};
+
+void swap(struct Student *a, struct Student *b) {
+    struct Student temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(struct Student arr[], int low, int high) {
+    int pivot = arr[high].rollNo; 
+    int i = (low - 1);
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j].rollNo < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+void quickSort(struct Student arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void printStudents(struct Student arr[], int n) {
+    printf("Roll No\tName\t\tSGPA\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%s\t\t%.2f\n", arr[i].rollNo, arr[i].name, arr[i].SGPA);
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter the number of students: ");
+    scanf("%d", &n);
+    
+    struct Student students[n];
+
+    for (int i = 0; i < n; i++) {
+        printf("\nEnter details for student %d:\n", i + 1);
+        printf("Roll No: ");
+        scanf("%d", &students[i].rollNo);
+        getchar();
+        printf("Name: ");
+        fgets(students[i].name, 100, stdin);
+        students[i].name[strcspn(students[i].name, "\n")] = '\0';
+        printf("SGPA: ");
+        scanf("%f", &students[i].SGPA);
+    }
+    
+    printf("\nBefore sorting:\n");
+    printStudents(students, n);
+    
+    // Apply quicksort to sort students by roll number
+    quickSort(students, 0, n - 1);
+    
+    printf("\nAfter sorting by roll number:\n");
+    printStudents(students, n);
+    
+    return 0;
+}

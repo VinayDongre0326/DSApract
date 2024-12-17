@@ -1,0 +1,92 @@
+//Circular_Queue
+#include <iostream>
+using namespace std;
+
+#define MAX_SIZE 3
+class CircularQueue {
+private:
+    int front, rear, size;
+    int queue[MAX_SIZE];
+
+public:
+    CircularQueue() {
+        front = rear = -1;
+        size = 0;
+    }
+    bool isFull() {
+        return size == MAX_SIZE;
+    }
+    bool isEmpty() {
+        return size == 0;
+    }
+    
+    void enqueue(int value) {
+        if (isFull()) {
+            cout << "Queue is full. Cannot enqueue " << value << endl;
+            return;
+        }
+        rear = (rear + 1) % MAX_SIZE;
+        queue[rear] = value;
+        if (front == -1) {
+            front = 0;
+        }
+        size++;
+        cout << "Enqueued: " << value << endl;
+    }
+    
+    void dequeue() {
+        if (isEmpty()) {
+            cout << "Queue is empty. Cannot dequeue." << endl;
+            return;
+        }
+        cout << "Dequeued: " << queue[front] << endl;
+        front = (front + 1) % MAX_SIZE;
+        size--;
+        if (isEmpty()) {
+            front = rear = -1;
+        }
+    }
+    
+    void display() {
+        if (isEmpty()) {
+            cout << "Queue is empty." << endl;
+            return;
+        }
+        cout << "Queue elements: ";
+        for (int i = 0; i < size; i++) {
+            cout << queue[(front + i) % MAX_SIZE] << " ";
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    CircularQueue cq;
+   int choice, value;
+   
+    while (true) {
+        cout << "\n1. Enqueue\n2. Dequeue\n3. Display\n4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter value to enqueue: ";
+                cin >> value;
+                cq.enqueue(value);
+                break;
+            case 2:
+                cq.dequeue();
+                break;
+            case 3:
+                cq.display();
+                break;
+            case 4:
+                cout << "Exiting program." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice. Try again." << endl;
+        }
+    }
+}
+

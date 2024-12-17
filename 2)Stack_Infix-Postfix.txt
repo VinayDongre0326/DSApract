@@ -1,0 +1,126 @@
+//Stack_Infix-Postfix
+//2+(6-4)*9
+#include <iostream>
+#include <stack>
+#include <string>
+#include <cctype>
+using namespace std;
+class Stack {
+private:
+    int top;
+    int capacity;
+    char* array;
+
+public:
+    Stack(int size) {
+        capacity = size;
+        array = new char[capacity];
+        top = -1;
+    }
+
+    ~Stack() {
+        delete[] array;
+    }
+
+    void push(char item) {
+        if (top == capacity - 1) {
+            cout << "Stack overflow" << endl;
+            return;
+        }
+        array[++top] = item;
+    }
+
+    char pop() {
+        if (isEmpty()) {
+            cout << "Stack underflow" << endl;
+            return -1;
+        }
+        return array[top--];
+    }
+    
+    char peek() {
+        if (isEmpty())
+            return -1;
+        return array[top];
+    }
+    bool isEmpty() {
+        return top == -1;
+    }
+};
+bool isOperator(char ch) {
+    return ch == '+' || ch == '-' || ch == '*' || ch == '/';
+}
+int precedence(char op) {
+    if (op == '+' || op == '-')
+        return 1;
+    if (op == '*' || op == '/')
+        return 2;
+    return 0;
+}
+string infixToPostfix(string infix) {
+    string postfix;
+    Stack stack(infix.length());
+
+    for (char ch : infix) {
+        if (isalnum(ch)) {
+            postfix += ch;
+        } else if (ch == '(') {
+            stack.push(ch);
+        } else if (ch == ')') {
+            while (!stack.isEmpty() && stack.peek() != '(') {
+                postfix += stack.pop();
+            }
+            stack.pop(); // Remove '('
+        } else if (isOperator(ch)) {
+            while (!stack.isEmpty() && precedence(stack.peek()) >= precedence(ch)) {
+                postfix += stack.pop();
+            }
+            stack.push(ch);
+        }
+    }
+    while (!stack.isEmpty()) {
+        postfix += stack.pop();
+    }
+    return postfix;
+}
+int evaluatePostfix(string postfix) {
+    stack<int> evalStack;
+    for (char ch : postfix) {
+        if (isdigit(ch)) {
+            evalStack.push(ch - '0');
+        } else if (isOperator(ch)) {
+            int val2 = evalStack.top();
+            evalStack.pop();
+            int val1 = evalStack.top();
+            evalStack.pop();
+
+            switch (ch) {
+                case '+':
+                    evalStack.push(val1 + val2);
+                    break;
+                case '-':
+                    evalStack.push(val1 - val2);
+                    break;
+                case '*':
+                    evalStack.push(val1 * val2);
+                    break;
+                case '/':
+                    evalStack.push(val1 / val2);
+                    break;
+            }
+        }
+    }
+    return evalStack.top();
+}
+int main() {
+    string infix;
+    cout << "Enter an infix expression: ";
+    cin >> infix;
+
+    string postfix = infixToPostfix(infix);
+    cout << "Postfix Expression: " << postfix << endl;
+
+    int result = evaluatePostfix(postfix);
+    cout << "Evaluation Result: " << result << endl;
+    return 0;
+}
